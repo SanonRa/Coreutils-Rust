@@ -52,4 +52,14 @@ target/release/coreutils --coreutils-prog=ls -la
 
 ## 📜 License
 
+```text
+Coreutils-Rust
+Copyright (C) 2026 Saketh Rayudu .A
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+```
+
 This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) or [COPYING](COPYING) file for details.
