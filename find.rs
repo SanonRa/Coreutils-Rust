@@ -43,7 +43,7 @@ fn glob_match(pattern: &str, text: &str) -> bool {
 
 fn matches(path: &Path, opts: &FindOpts) -> bool {
     if let Some(ref pat) = opts.name_pattern {
-        let name = path.file_name().to_string_lossy();
+        let name = path.file_name().unwrap_or_default().to_string_lossy();
         if !glob_match(pat, &name) { return false; }
     }
     if let Some(ft) = opts.file_type {
