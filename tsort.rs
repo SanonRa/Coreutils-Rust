@@ -22,11 +22,13 @@ fn main() {
     let file_arg = args.get(1).map(|s| s.as_str()).unwrap_or("-");
     let reader: Box<dyn Read> = if file_arg == "-" {
         Box::new(io::stdin())
-    } else match File::open(file_arg) {
-        Ok(f) => Box::new(f),
-        Err(e) => {
-            eprintln!("tsort: {}: {}", file_arg, e);
-            process::exit(1);
+    } else {
+        match File::open(file_arg) {
+            Ok(f) => Box::new(f),
+            Err(e) => {
+                eprintln!("tsort: {}: {}", file_arg, e);
+                process::exit(1);
+            }
         }
     };
 
