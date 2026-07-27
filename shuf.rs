@@ -91,9 +91,11 @@ fn main() {
         let file_arg = operands.first().map(|s| s.as_str()).unwrap_or("-");
         let reader: Box<dyn io::Read> = if file_arg == "-" {
             Box::new(io::stdin())
-        } else match File::open(file_arg) {
-            Ok(f) => Box::new(f),
-            Err(e) => { eprintln!("shuf: {}: {}", file_arg, e); process::exit(1); }
+        } else {
+            match File::open(file_arg) {
+                Ok(f) => Box::new(f),
+                Err(e) => { eprintln!("shuf: {}: {}", file_arg, e); process::exit(1); }
+            }
         };
         for line in BufReader::new(reader).lines().map_while(Result::ok) {
             lines.push(line);
