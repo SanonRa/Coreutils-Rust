@@ -79,11 +79,13 @@ fn main() {
     for file in &files {
         if file == "-" {
             process_stream(io::stdin(), &separator, before);
-        } else match File::open(file) {
-            Ok(f) => process_stream(f, &separator, before),
-            Err(e) => {
-                eprintln!("tac: failed to open '{}' for reading: {}", file, e);
-                process::exit(1);
+        } else {
+            match File::open(file) {
+                Ok(f) => process_stream(f, &separator, before),
+                Err(e) => {
+                    eprintln!("tac: failed to open '{}' for reading: {}", file, e);
+                    process::exit(1);
+                }
             }
         }
     }

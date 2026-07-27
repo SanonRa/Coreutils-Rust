@@ -99,9 +99,11 @@ fn main() {
     let mut buffer = Vec::new();
     let reader: Box<dyn Read> = if file_arg == "-" {
         Box::new(io::stdin())
-    } else match File::open(&file_arg) {
-        Ok(f) => Box::new(f),
-        Err(e) => { eprintln!("base64: {}: {}", file_arg, e); process::exit(1); }
+    } else {
+        match File::open(&file_arg) {
+            Ok(f) => Box::new(f),
+            Err(e) => { eprintln!("base64: {}: {}", file_arg, e); process::exit(1); }
+        }
     };
 
     let mut buf_reader = reader;
