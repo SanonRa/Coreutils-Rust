@@ -78,9 +78,11 @@ fn main() {
     for file in files {
         if file == "-" {
             process_stream(io::stdin(), width, "");
-        } else match File::open(&file) {
-            Ok(f) => process_stream(f, width, &file),
-            Err(e) => { eprintln!("ptx: {}: {}", file, e); process::exit(1); }
+        } else {
+            match File::open(&file) {
+                Ok(f) => process_stream(f, width, &file),
+                Err(e) => { eprintln!("ptx: {}: {}", file, e); process::exit(1); }
+            }
         }
     }
 }
