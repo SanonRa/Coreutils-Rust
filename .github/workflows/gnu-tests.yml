@@ -1,0 +1,50 @@
+name: GNU Coreutils Online Test Suite Workflow
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      target_utility:
+        description: 'Utility to test (e.g. cat, echo, ls, or "all")'
+        required: false
+        default: 'all'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  gnu-test-runner:
+    name: Run GNU Coreutils Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Build & Testing Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y autopoint bison gettext gperf texinfo rsync python3
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Coreutils Binaries (Release)
+        run: cargo build --release
+
+      - name: Prepare Test Harness & Folder
+        run: |
+          chmod +x tests/gnu/run_gnu_tests.sh
+          chmod +x tests/gnu/test_runner.py
+          bash tests/gnu/run_gnu_tests.sh
+
+      - name: Execute Test Suite Harness
+        run: |
+          python3 tests/gnu/test_runner.py --utility "${{ github.event.inputs.target_utility || 'all' }}"
+          echo "GNU Coreutils workflow test harness execution finished successfully."
