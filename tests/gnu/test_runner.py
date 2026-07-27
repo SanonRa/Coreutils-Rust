@@ -1,30 +1,47 @@
 #!/usr/bin/env python3
 """
-GNU Coreutils Test Suite Runner & Reporter
+GNU Coreutils Test Suite Summary Reporter
 """
-import os
 import sys
-import subprocess
-import argparse
+import re
 from pathlib import Path
 
 def main():
-    parser = argparse.ArgumentParser(description="Run GNU Coreutils tests against Rust binaries")
-    parser.add_argument("--utility", "-u", default="all", help="Target utility to test (e.g., cat, echo, ls, or 'all')")
-    args = parser.parse_args()
-
     repo_root = Path(__file__).resolve().parent.parent.parent
-    bin_dir = repo_root / "target" / "release"
-    gnu_dir = repo_root / "tests" / "gnu" / "coreutils-src"
+    log_file = repo_root / "tests" / "gnu" / "coreutils-src" / "tests" / "test-suite.log"
 
-    print(f"[*] Coreutils Rust Root: {repo_root}")
-    print(f"[*] Target Utility: {args.utility}")
+    print("==========================================")
+    print(" GNU Coreutils Test Suite Results Summary ")
+    print("==========================================")
 
-    if not bin_dir.exists():
-        print("[!] Release binaries not found. Building release target...")
-        subprocess.run(["cargo", "build", "--release"], cwd=repo_root, check=True)
+    if not log_file.exists():
+        print(f"[!] Test suite log file not found at: {log_file}")
+        sys.exit(0)
 
-    print("[*] Coreutils test harness ready.")
+    content = log_file.read_text(encoding="utf-8", errors="ignore")
+
+    total = 0
+    passed = 0
+    failed = 0
+    skipped = 0
+
+    for line in content.splitlines():
+        if line.startswith("# TOTAL:"):
+            total = int(re.search(r'\d+', line).group())
+        elif line.startswith("# PASS:"):
+            passed = int(re.search(r'\d+', line).group())
+        elif line.startswith("# FAIL:"):
+            failed = int(re.search(r'\d+', line).group())
+        elif line.startswith("# SKIP:"):
+            skipped = int(re.search(r'\d+', line).group())
+        elif line.startswith("# ERROR:"):
+            failed += int(re.search(r'\d+', line).group())
+
+    print(f"Total Tests : {total}")
+    print(f"Passed      : {passed}")
+    print(f"Failed      : {failed}")
+    print(f"Skipped     : {skipped}")
+    print("==========================================")
 
 if __name__ == "__main__":
     main()

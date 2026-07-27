@@ -27,7 +27,7 @@ jobs:
       - name: Install Build & Testing Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y autopoint bison gettext gperf texinfo rsync python3
+          sudo apt-get install -y autopoint bison gettext gperf texinfo rsync python3 autoconf automake libcap-dev gawk build-essential
 
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -38,13 +38,23 @@ jobs:
       - name: Build Coreutils Binaries (Release)
         run: cargo build --release
 
-      - name: Prepare Test Harness & Folder
+      - name: Execute GNU Coreutils Test Suite
         run: |
           chmod +x tests/gnu/run_gnu_tests.sh
           chmod +x tests/gnu/test_runner.py
           bash tests/gnu/run_gnu_tests.sh
 
-      - name: Execute Test Suite Harness
+      - name: Report GNU Test Suite Summary
+        if: always()
         run: |
-          python3 tests/gnu/test_runner.py --utility "${{ github.event.inputs.target_utility || 'all' }}"
-          echo "GNU Coreutils workflow test harness execution finished successfully."
+          python3 tests/gnu/test_runner.py
+
+      - name: Upload Complete Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnu-test-suite-logs
+          path: |
+            tests/gnu/coreutils-src/tests/test-suite.log
+            tests/gnu/coreutils-src/tests/**/*.log
+          if-no-files-found: ignore
