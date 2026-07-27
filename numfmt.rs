@@ -37,7 +37,7 @@ fn format_num(val: f64, mode: &Mode) -> String {
 fn parse_num(s: &str, mode: &Mode) -> Option<f64> {
     let mut num_str = s.trim().to_string();
     let mut mult = 1.0;
-    let base = match mode { Mode::Iec => 1024.0, _ => 1000.0 };
+    let base: f64 = match mode { Mode::Iec => 1024.0, _ => 1000.0 };
 
     if num_str.ends_with('i') { num_str.pop(); }
     if let Some(c) = num_str.chars().last() {
